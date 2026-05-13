@@ -1,0 +1,308 @@
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border: 1.5px solid #f0f0f0;
+  cursor: grab;
+  position: relative;
+  transition: box-shadow 0.2s, transform 0.2s;
+  margin-bottom: 10px;
+  user-select: none;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  border-color: #e0d7ff;
+  transform: translateY(-1px);
+}
+
+.card.dragging {
+  box-shadow: 0 10px 30px rgba(124,58,237,0.25);
+  transform: rotate(2deg) scale(1.02);
+  border-color: #7C3AED;
+  cursor: grabbing;
+}
+
+.card.completed {
+  opacity: 0.75;
+  background: #f9fafb;
+}
+
+.label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.menuBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  opacity: 0;
+  transition: all 0.15s;
+}
+
+.card:hover .menuBtn {
+  opacity: 1;
+}
+
+.menuBtn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.menu {
+  position: absolute;
+  top: 36px;
+  right: 10px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  border: 1px solid #e5e7eb;
+  z-index: 50;
+  overflow: hidden;
+  min-width: 140px;
+  animation: popIn 0.15s ease;
+}
+
+/* Portal version — fixed positioned, always on top */
+.menuPortal {
+  position: fixed;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  border: 1px solid #e5e7eb;
+  z-index: 9999;
+  overflow: hidden;
+  min-width: 150px;
+  animation: popIn 0.15s ease;
+}
+
+.menuPortal button,
+.menu button {
+  display: block;
+  width: 100%;
+  padding: 9px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.menuPortal button:hover,
+.menu button:hover {
+  background: #f3f4f6;
+}
+
+.menuPortal button.danger,
+.menu button.danger {
+  color: #ef4444;
+}
+
+.menuPortal button.danger:hover,
+.menu button.danger:hover {
+  background: #fef2f2;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 6px;
+  line-height: 1.4;
+  padding-right: 20px;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+.description {
+  font-size: 12.5px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.progressBar {
+  height: 5px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  border-radius: 10px;
+  transition: width 0.3s;
+}
+
+.overdue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #ef4444;
+  background: #fef2f2;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.completedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #10b981;
+  background: #ecfdf5;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dueDate,
+.comments {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.assignees {
+  display: flex;
+  align-items: center;
+}
+
+.assignee {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  border: 2px solid white;
+  margin-left: -6px;
+  cursor: default;
+}
+
+.assigneeMore {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  margin-left: -6px;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-5px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── New card styles ─────────────────────────────────────────────────────── */
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  min-height: 18px;
+}
+
+.statusBadge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.priorityDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.doneBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #10b981;
+  margin-top: 4px;
+}
+
+.dueDateOverdue {
+  color: #ef4444 !important;
+}
+
+.footerRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.assigneeAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  border: 1.5px solid white;
+}
