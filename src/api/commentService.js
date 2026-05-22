@@ -1,19 +1,3 @@
-/**
- * commentService.js  (NEW FILE)
- * Maps to comment-service endpoints (routed via API Gateway).
- *
- * Backend routes:
- *   POST   /comments                        → add comment { cardId, content, parentCommentId? }
- *   GET    /comments/card/{cardId}          → get top-level comments for card
- *   GET    /comments/{commentId}            → get comment by id
- *   GET    /comments/{commentId}/replies    → get replies
- *   GET    /comments/card/{cardId}/count    → get comment count
- *   PUT    /comments/{commentId}            → edit comment { content }
- *   DELETE /comments/{commentId}            → soft-delete comment
- *   POST   /attachments                     → add attachment { cardId, fileUrl, fileName, fileSize }
- *   GET    /attachments/card/{cardId}       → get attachments for card
- *   DELETE /attachments/{attachmentId}      → delete attachment
- */
 import api from './axiosInstance';
 
 // Add a comment to a card. data: { cardId, content, parentCommentId? }

@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Draggable } from '@hello-pangea/dnd';
-import { MoreHorizontal, Calendar, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { MoreHorizontal, Calendar, CheckCircle2, AlertTriangle, CheckSquare } from 'lucide-react';
 import { useBoard } from '../../context/BoardContext';
 import Avatar from '../Avatar/Avatar';
+import * as labelService from '../../api/labelService';
 import styles from './Card.module.css';
 
 const STATUS_COLORS = {
@@ -23,6 +24,7 @@ const PRIORITY_DOTS = {
 // Portal-based menu — escapes any overflow:hidden parent container
 function CardMenu({ card, onEdit, updateCard, deleteCard }) {
   const btnRef = useRef(null);
+  const menuRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, right: 0 });
 
@@ -38,7 +40,9 @@ function CardMenu({ card, onEdit, updateCard, deleteCard }) {
   useEffect(() => {
     if (!open) return undefined;
     const close = (e) => {
-      if (btnRef.current && !btnRef.current.contains(e.target)) setOpen(false);
+      const inBtn  = btnRef.current?.contains(e.target);
+      const inMenu = menuRef.current?.contains(e.target);
+      if (!inBtn && !inMenu) setOpen(false);
     };
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
@@ -52,9 +56,9 @@ function CardMenu({ card, onEdit, updateCard, deleteCard }) {
 
       {open && createPortal(
         <div
+          ref={menuRef}
           className={styles.menuPortal}
           style={{ top: pos.top, right: pos.right }}
-          onClick={(e) => e.stopPropagation()}
         >
           <button onClick={() => { onEdit(card); setOpen(false); }}>Edit</button>
           <button onClick={() => {
@@ -63,10 +67,14 @@ function CardMenu({ card, onEdit, updateCard, deleteCard }) {
           }}>
             {card.status === 'DONE' ? 'Mark Incomplete' : 'Mark Done'}
           </button>
-          <button className={styles.danger} onClick={(e) => {
+          <button className={styles.danger} onClick={async (e) => {
             e.stopPropagation();
-            deleteCard(card.id);
             setOpen(false);
+            try {
+              await deleteCard(card.id);
+            } catch (err) {
+              console.error('[Card] deleteCard failed:', err?.response?.data || err.message);
+            }
           }}>
             Delete
           </button>
@@ -78,12 +86,47 @@ function CardMenu({ card, onEdit, updateCard, deleteCard }) {
 }
 
 export default function Card({ card, index, onEdit, readOnly = false }) {
-  const { deleteCard, updateCard, getCachedUserProfile } = useBoard();
+  const { deleteCard, updateCard, getCachedUserProfile, fetchUserProfile } = useBoard();
 
   const statusStyle = STATUS_COLORS[card.status] || STATUS_COLORS.TO_DO;
   const priorityColor = PRIORITY_DOTS[card.priority] || '#6b7280';
   const isOverdue = card.overdue || (card.dueDate && new Date(card.dueDate) < new Date() && card.status !== 'DONE');
-  const assigneeProfile = card.assigneeId ? getCachedUserProfile(card.assigneeId) : null;
+  
+  const [assigneeProfile, setAssigneeProfile] = useState(null);
+
+  useEffect(() => {
+    if (card.assigneeId) {
+      const cached = getCachedUserProfile(card.assigneeId);
+      if (cached) {
+        setAssigneeProfile(cached);
+      } else {
+        fetchUserProfile(card.assigneeId).then((profile) => {
+          if (profile) setAssigneeProfile(profile);
+        });
+      }
+    } else {
+      setAssigneeProfile(null);
+    }
+  }, [card.assigneeId, getCachedUserProfile, fetchUserProfile]);
+
+  // Checklist summary for the badge
+  const [checklistSummary, setChecklistSummary] = useState(null); // { total, completed }
+  useEffect(() => {
+    if (!card.id) return;
+    labelService.getChecklistsByCard(card.id)
+      .then((lists) => {
+        if (!Array.isArray(lists) || lists.length === 0) return;
+        let total = 0, completed = 0;
+        lists.forEach((cl) => {
+          (cl.items || []).forEach((it) => {
+            total++;
+            if (it.completed || it.isCompleted || it.done) completed++;
+          });
+        });
+        if (total > 0) setChecklistSummary({ total, completed });
+      })
+      .catch(() => {});
+  }, [card.id]);
 
   return (
     <Draggable draggableId={card.id} index={index} isDragDisabled={readOnly}>
@@ -155,6 +198,12 @@ export default function Card({ card, index, onEdit, readOnly = false }) {
                 <span className={`${styles.dueDate} ${isOverdue ? styles.dueDateOverdue : ''}`}>
                   <Calendar size={11} />
                   {new Date(card.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+              )}
+              {checklistSummary && (
+                <span className={`${styles.checklistBadge} ${checklistSummary.completed === checklistSummary.total ? styles.checklistDone : ''}`}>
+                  <CheckSquare size={11} />
+                  {checklistSummary.completed}/{checklistSummary.total}
                 </span>
               )}
             </div>

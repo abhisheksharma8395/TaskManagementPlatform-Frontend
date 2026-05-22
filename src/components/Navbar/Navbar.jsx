@@ -21,7 +21,6 @@ export default function Navbar() {
   const links = useMemo(() => {
     const items = [
       { label: 'Dashboard', to: '/dashboard' },
-      { label: 'Tasks', to: '/tasks' },
       { label: 'Settings', to: '/settings' },
     ];
     if (isPlatformAdmin) items.push({ label: 'Admin', to: '/admin' });
@@ -76,7 +75,7 @@ export default function Navbar() {
     <header className={styles.navbar}>
       <div className={styles.left}>
         <Link to={isPlatformAdmin ? '/admin' : '/dashboard'} className={styles.logo}>
-          <span className={styles.logoIcon}>FB</span>
+          <img src="/logo.svg" alt="FlowBoard" height={34} width={34} style={{ display: 'block' }} />
           <span className={styles.logoText}>FlowBoard</span>
         </Link>
 

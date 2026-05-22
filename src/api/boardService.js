@@ -1,23 +1,4 @@
-/**
- * boardService.js
- * Maps to board-service endpoints (routed via API Gateway).
- *
- * Backend routes:
- *   POST   /boards                          → create board
- *   GET    /boards/{boardId}                → get board
- *   GET    /boards/workspace/{workspaceId}  → get boards in workspace
- *   GET    /boards/member/{userId}          → get boards user is member of
- *   PUT    /boards/{boardId}                → update board
- *   PUT    /boards/{boardId}/close          → close board
- *   DELETE /boards/{boardId}                → delete board
- *   POST   /boards/{boardId}/members        → add member
- *   DELETE /boards/{boardId}/members/{userId} → remove member
- *   PUT    /boards/{boardId}/members/{userId}/role → update role
- *   GET    /boards/{boardId}/members        → list members
- *
- * BoardResponse fields: boardId, workspaceId, name, description,
- *   background, visibility, createdById, isClosed, memberCount, createdAt, updatedAt
- */
+
 import api from './axiosInstance';
 
 // Create a board. Required: workspaceId (Long), name. Optional: description, visibility

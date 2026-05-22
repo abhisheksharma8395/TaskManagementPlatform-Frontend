@@ -1,22 +1,3 @@
-/**
- * listService.js
- * Maps to list-service endpoints (routed via API Gateway).
- *
- * Backend routes:
- *   POST   /lists                          → create list
- *   GET    /lists/{listId}                 → get list by id
- *   GET    /lists/board/{boardId}          → get active lists for board (ordered by position)
- *   GET    /lists/board/{boardId}/archived → get archived lists
- *   PUT    /lists/{listId}                 → update list name/colour
- *   PUT    /lists/board/{boardId}/reorder  → reorder lists (drag-and-drop)
- *   POST   /lists/{listId}/archive         → archive list
- *   POST   /lists/{listId}/unarchive       → restore list
- *   DELETE /lists/{listId}                 → permanently delete archived list
- *   PUT    /lists/{listId}/move            → move list to different board
- *
- * ListResponse fields: listId, boardId, name, position, color, isArchived, createdAt, updatedAt
- * NOTE: Backend uses `name` (not `title`). Frontend must use `list.name`.
- */
 import api from './axiosInstance';
 
 // Create a list. Required: boardId (Long), name. Optional: color

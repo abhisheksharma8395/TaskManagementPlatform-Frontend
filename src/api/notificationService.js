@@ -1,16 +1,3 @@
-/**
- * notificationService.js
- * Maps to notification-service endpoints (routed via API Gateway).
- *
- * Backend routes:
- *   GET  /notifications/my              → get all notifications for logged-in user
- *   GET  /notifications/my/unread       → get unread notifications
- *   GET  /notifications/my/unread-count → { count } — for badge display
- *   PUT  /notifications/{id}/read       → mark single notification as read
- *   PUT  /notifications/my/read-all     → mark all as read
- *   DELETE /notifications/my/read       → delete all read notifications
- *   DELETE /notifications/{id}          → delete a specific notification
- */
 import api from './axiosInstance';
 
 // Get all notifications for the logged-in user (newest first)

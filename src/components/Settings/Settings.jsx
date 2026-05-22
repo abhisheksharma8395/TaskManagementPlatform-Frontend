@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 import {
-  Camera, Moon, Key, Check,
+  Camera, Key, Check,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import * as authService from '../../api/authService';
@@ -33,10 +33,6 @@ export default function Settings() {
   const [pwError, setPwError] = useState('');
   const [pwSuccess, setPwSuccess] = useState(false);
 
-  // ── Preferences ───────────────────────────────────────────────────────────
-  const [darkMode, setDarkMode] = useState(false);
-  const [pushNotif, setPushNotif] = useState(true);
-  const [reduceMotion, setReduceMotion] = useState(false);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
 
@@ -85,7 +81,6 @@ export default function Settings() {
   const navItems = [
     { key: 'profile', label: 'Profile', icon: <Camera size={15} /> },
     { key: 'password', label: 'Password', icon: <Key size={15} /> },
-    { key: 'preferences', label: 'Preferences', icon: <Moon size={15} /> },
   ];
 
   return (
@@ -196,52 +191,8 @@ export default function Settings() {
               </div>
             </section>
           )}
-
-          {/* ── Preferences ─────────────────────────────────────────────── */}
-          {activeSection === 'preferences' && (
-            <>
-              <section className={styles.card}>
-                <h2 className={styles.cardTitle}>Display & Notifications</h2>
-                <div className={styles.toggleList}>
-                  <ToggleRow icon={<Moon size={16} />} label="Dark Mode"
-                    checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
-                  <ToggleRow icon={<Bell size={16} />} label="Push Notifications"
-                    checked={pushNotif} onChange={() => setPushNotif(!pushNotif)} />
-                  <ToggleRow icon={<Minimize2 size={16} />} label="Reduce Motion"
-                    checked={reduceMotion} onChange={() => setReduceMotion(!reduceMotion)} />
-                </div>
-              </section>
-
-              <section className={styles.card}>
-                <h3 className={styles.dangerTitle}>Danger Zone</h3>
-                <p className={styles.dangerDesc}>
-                  Deactivating your account is permanent. All your data will be removed.
-                </p>
-                <button className={styles.deleteBtn} onClick={handleDeactivateAccount}>
-                  <Trash2 size={14} /> Deactivate Account
-                </button>
-              </section>
-            </>
-          )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function ToggleRow({ icon, label, checked, onChange }) {
-  return (
-    <div className={styles.toggleRow}>
-      <div className={styles.toggleLeft}>
-        <span className={styles.toggleIcon}>{icon}</span>
-        <span className={styles.toggleLabel}>{label}</span>
-      </div>
-      <button
-        className={`${styles.toggle} ${checked ? styles.toggleOn : ''}`}
-        onClick={onChange} role="switch" aria-checked={checked}
-      >
-        <span className={styles.toggleThumb} />
-      </button>
     </div>
   );
 }

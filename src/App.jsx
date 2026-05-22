@@ -18,10 +18,12 @@ import WorkspacePage from './pages/WorkspacePage/WorkspacePage';
 import BoardPage from './pages/BoardPage/BoardPage';
 import AdminPage from './pages/AdminPage/AdminPage';
 import PublicDashboard from './pages/PublicDashboard/PublicDashboard';
+import LandingPage from './pages/LandingPage/LandingPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { BoardProvider } from './context/BoardContext';
 import './App.css';
 
+/* ── OAuth callback handler ─────────────────────────────────────────── */
 function OAuthSuccess() {
   const { loginWithToken } = useAuth();
   const [status, setStatus] = useState('Processing Google login...');
@@ -48,6 +50,7 @@ function OAuthSuccess() {
   return <div className="center-screen">{status}</div>;
 }
 
+/* ── Authenticated shell (Navbar + Sidebar) ─────────────────────────── */
 function AppLayout() {
   return (
     <BoardProvider>
@@ -64,6 +67,7 @@ function AppLayout() {
   );
 }
 
+/* ── /login route: redirect away if already authenticated ───────────── */
 function LoginRoute() {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -76,23 +80,33 @@ function LoginRoute() {
   return <AuthPage />;
 }
 
-function DefaultRoute() {
+/* ── / route: show landing page; redirect to app if authenticated ────── */
+function RootRoute() {
   const { user, loading, isPlatformAdmin } = useAuth();
 
   if (loading) return <div className="center-screen">Loading...</div>;
-  if (!user) return <Navigate to="/login" replace />;
-  return <Navigate to={isPlatformAdmin ? '/admin' : '/dashboard'} replace />;
+
+  // Authenticated users skip the landing page and go to their home
+  if (user) {
+    return <Navigate to={isPlatformAdmin ? '/admin' : '/dashboard'} replace />;
+  }
+
+  // Unauthenticated visitors see the landing page
+  return <LandingPage />;
 }
 
+/* ── App ────────────────────────────────────────────────────────────── */
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<RootRoute />} />
           <Route path="/login" element={<LoginRoute />} />
           <Route path="/oauth-success" element={<OAuthSuccess />} />
-          <Route path="/" element={<DefaultRoute />} />
 
+          {/* Protected user routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -104,12 +118,14 @@ export default function App() {
             </Route>
           </Route>
 
+          {/* Protected admin-only routes */}
           <Route element={<ProtectedRoute requirePlatformAdmin />}>
             <Route element={<AppLayout />}>
               <Route path="/admin" element={<AdminPage />} />
             </Route>
           </Route>
 
+          {/* Fallback → landing */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

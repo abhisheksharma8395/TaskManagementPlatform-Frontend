@@ -1,23 +1,3 @@
-/**
- * workspaceService.js
- * Maps to workspace-service endpoints (routed via API Gateway).
- *
- * Backend routes:
- *   POST   /workspaces                              → create workspace
- *   GET    /workspaces/{id}                         → get by id
- *   GET    /workspaces/owner/{ownerId}              → get by owner
- *   GET    /workspaces/member/{userId}              → get by member
- *   GET    /workspaces/public                       → list public workspaces
- *   PUT    /workspaces/{id}                         → update workspace
- *   DELETE /workspaces/{id}                         → delete workspace
- *   POST   /workspaces/{id}/members                 → add member (needs userId, not email)
- *   DELETE /workspaces/{id}/members/{userId}        → remove member
- *   PUT    /workspaces/{id}/members/{userId}/role   → update member role
- *   GET    /workspaces/{id}/members                 → list members
- *
- * WorkspaceResponse fields: workspaceId, name, description, ownerId,
- *   visibility, logoUrl, createdAt, updatedAt, memberCount
- */
 import api from './axiosInstance';
 
 // Create a new workspace. Required: name. Optional: description, visibility ('PUBLIC'|'PRIVATE')
@@ -44,7 +24,7 @@ export const updateWorkspace = (workspaceId, data) =>
 export const deleteWorkspace = (workspaceId) =>
   api.delete(`/workspace-service/workspaces/${workspaceId}`).then((r) => r.data);
 
-// Add a member by userId (NOT email — backend requires userId)
+// Add a member by email
 // data: { userId: Long, role: 'ADMIN'|'MEMBER' }
 export const addMember = (workspaceId, data) =>
   api.post(`/workspace-service/workspaces/${workspaceId}/members`, data).then((r) => r.data);

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00C9B8"/>
+      <stop offset="100%" stop-color="#1A5FCC"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00B5A6"/>
+      <stop offset="100%" stop-color="#1A5FCC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="90" stroke="url(#ringGrad)" stroke-width="12" fill="white"/>
+
+  <!-- F shape (left side) -->
+  <!-- Vertical bar of F -->
+  <rect x="38" y="62" width="14" height="76" rx="4" fill="url(#iconGrad)"/>
+  <!-- Top horizontal bar of F -->
+  <rect x="38" y="62" width="36" height="14" rx="4" fill="url(#iconGrad)"/>
+  <!-- Middle horizontal bar of F -->
+  <rect x="38" y="93" width="28" height="12" rx="4" fill="url(#iconGrad)"/>
+
+  <!-- Arrow pointing right -->
+  <path d="M70 100 L88 100" stroke="url(#iconGrad)" stroke-width="11" stroke-linecap="round"/>
+  <path d="M80 88 L94 100 L80 112" stroke="url(#iconGrad)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- B shape (right side) -->
+  <!-- Vertical bar of B -->
+  <rect x="98" y="62" width="13" height="76" rx="4" fill="url(#iconGrad)"/>
+  <!-- Top bump of B -->
+  <path d="M111 62 Q140 62 140 80 Q140 98 111 98" stroke="url(#iconGrad)" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <!-- Bottom bump of B -->
+  <path d="M111 98 Q144 98 144 118 Q144 138 111 138" stroke="url(#iconGrad)" stroke-width="12" fill="none" stroke-linecap="round"/>
+
+  <!-- Check marks on B -->
+  <path d="M118 77 L122 82 L130 73" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M118 97 L122 102 L130 93" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M118 117 L122 122 L130 113" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

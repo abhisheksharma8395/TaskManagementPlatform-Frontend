@@ -285,25 +285,18 @@ export function BoardProvider({ children }) {
   const inviteMember = useCallback(async (workspaceId, email, role = 'MEMBER') => {
     await ensureWorkspaceAccess(workspaceId, { adminOnly: true });
 
-    let found = null;
-    try {
-      found = await authService.getUserByEmail(email);
-    } catch {
-      const matches = await authService.searchUsersByName(email).catch(() => []);
-      found = Array.isArray(matches) ? matches.find((item) => item.email === email) : null;
-    }
-
-    if (!found) throw new Error(`No user found with email: ${email}`);
     const createdMember = await workspaceService.addMember(workspaceId, {
-      userId: found.userId,
+      email,
       role,
     });
+
+    const profile = await fetchUserProfile(createdMember.userId);
     const hydratedMember = {
       ...createdMember,
-      fullName: found.fullName || '',
-      username: found.username || '',
-      email: found.email || '',
-      avatarUrl: found.avatarUrl || '',
+      fullName: profile?.fullName || '',
+      username: profile?.username || '',
+      email: profile?.email || email,
+      avatarUrl: profile?.avatarUrl || '',
     };
 
     setWorkspaceMembersById((prev) => ({
@@ -315,7 +308,7 @@ export function BoardProvider({ children }) {
     }));
 
     return hydratedMember;
-  }, [ensureWorkspaceAccess]);
+  }, [ensureWorkspaceAccess, fetchUserProfile]);
 
   const removeWorkspaceMember = useCallback(async (workspaceId, userId) => {
     await ensureWorkspaceAccess(workspaceId, { adminOnly: true });
@@ -643,11 +636,13 @@ export function BoardProvider({ children }) {
     return updated;
   }, [cards, ensureBoardAccess]);
 
-  const setCardAssignee = useCallback(async (cardId, assigneeId) => {
+  const setCardAssignee = useCallback(async (cardId, user) => {
     const card = cards.find((item) => item.id === String(cardId));
     await ensureBoardAccess(card?.boardId, { collaborate: true });
+    const fullName = user ? (user.fullName || user.username || (typeof user === 'string' ? user : null)) : null;
+    const email = user && typeof user === 'object' ? user.email : null;
     const updated = normalizeCard(
-      await cardService.setAssignee(cardId, { assigneeId: assigneeId == null ? null : Number(assigneeId) }),
+      await cardService.setAssignee(cardId, { fullName, email }),
       card?.listId,
     );
     setCards((prev) => prev.map((item) => (item.id === String(cardId) ? { ...item, ...updated } : item)));
@@ -657,9 +652,20 @@ export function BoardProvider({ children }) {
   const deleteCard = useCallback(async (cardId) => {
     const card = cards.find((item) => item.id === String(cardId));
     await ensureBoardAccess(card?.boardId, { collaborate: true });
-    await cardService.archiveCard(cardId);
-    await cardService.deleteCard(cardId);
+
+    // Optimistic removal so the UI feels instant
     setCards((prev) => prev.filter((item) => item.id !== String(cardId)));
+
+    try {
+      // Archive step is required by backend before permanent delete.
+      // Silently ignore if it fails (e.g. already archived, endpoint unavailable).
+      try { await cardService.archiveCard(cardId); } catch { /* already archived / no-op */ }
+      await cardService.deleteCard(cardId);
+    } catch (err) {
+      // Revert optimistic removal if the hard delete itself failed
+      if (card) setCards((prev) => [...prev, card]);
+      throw err;
+    }
   }, [cards, ensureBoardAccess]);
 
   const moveCard = useCallback(async (cardId, destinationListId, destinationIndex) => {

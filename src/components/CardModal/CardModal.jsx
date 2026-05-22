@@ -3,10 +3,11 @@
  * Implements: comments, attachments, labels, checklists, status, assignee, start date, cover color
  */
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X, Tag, CheckSquare, MessageCircle,
   Calendar, User, AlignLeft, Plus, Trash2, Edit2,
-  Check, CornerDownRight,
+  Check, CornerDownRight, Palette,
 } from 'lucide-react';
 import { useBoard } from '../../context/BoardContext';
 import { useAuth } from '../../context/AuthContext';
@@ -17,6 +18,7 @@ import * as cardService from '../../api/cardService';
 import * as authService from '../../api/authService';
 import AttachmentUpload from '../AttachmentUpload/AttachmentUpload';
 import Avatar from '../Avatar/Avatar';
+import ColorWheelPicker from '../ColorWheelPicker/ColorWheelPicker';
 import styles from './CardModal.module.css';
 
 const PRIORITY_OPTIONS = [
@@ -33,11 +35,6 @@ const STATUS_OPTIONS = [
   { value: 'DONE', label: 'Done', color: '#10b981' },
 ];
 
-const COVER_COLORS = [
-  '#ef4444', '#f97316', '#f59e0b', '#10b981',
-  '#06b6d4', '#3b82f6', '#7c3aed', '#ec4899',
-  '#6b7280', '#1f2937',
-];
 
 const LABEL_COLORS = [
   '#ef4444', '#f97316', '#f59e0b', '#10b981',
@@ -45,7 +42,16 @@ const LABEL_COLORS = [
 ];
 
 export default function CardModal({ card, onClose, readOnly = false }) {
-  const { addCard, updateCard, setCardAssignee, lists, activeBoardId, getCachedBoardMembers } = useBoard();
+  const {
+    addCard,
+    updateCard,
+    setCardAssignee,
+    lists,
+    activeBoardId,
+    getCachedBoardMembers,
+    activeWorkspaceId,
+    getCachedWorkspaceMembers,
+  } = useBoard();
   const { user } = useAuth();
   const isNew = !card.id;
 
@@ -100,8 +106,34 @@ export default function CardModal({ card, onClose, readOnly = false }) {
 
   const boardLists = lists.filter((l) => l.boardId === String(activeBoardId));
   const boardMembers = getCachedBoardMembers(activeBoardId);
+  const workspaceMembers = getCachedWorkspaceMembers(activeWorkspaceId);
   const searchTimeout = useRef(null);
   const userProfileCache = useRef({});
+
+  // Cover colour wheel
+  const [showCoverPicker, setShowCoverPicker] = useState(false);
+  const [coverPopupPos, setCoverPopupPos] = useState({ top: 0, left: 0 });
+  const coverTriggerRef = useRef(null);
+  const coverPopupRef = useRef(null);
+
+  const openCoverPicker = () => {
+    if (coverTriggerRef.current) {
+      const r = coverTriggerRef.current.getBoundingClientRect();
+      setCoverPopupPos({ top: r.bottom + 8, left: r.left });
+    }
+    setShowCoverPicker(true);
+  };
+
+  useEffect(() => {
+    if (!showCoverPicker) return undefined;
+    const handler = (e) => {
+      const inTrigger = coverTriggerRef.current?.contains(e.target);
+      const inPopup   = coverPopupRef.current?.contains(e.target);
+      if (!inTrigger && !inPopup) setShowCoverPicker(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showCoverPicker]);
 
   useEffect(() => {
     if (isNew) return;
@@ -147,7 +179,7 @@ export default function CardModal({ card, onClose, readOnly = false }) {
   const normalizeChecklistItem = (item) => ({
     ...item,
     itemId: item.itemId ?? item.id,
-    title: item.title ?? item.content ?? item.name ?? '',
+    title: item.title ?? item.text ?? item.content ?? item.name ?? '',
     completed: Boolean(item.completed ?? item.isCompleted ?? item.done),
   });
 
@@ -207,24 +239,33 @@ export default function CardModal({ card, onClose, readOnly = false }) {
   const handleAssigneeSearch = (val) => {
     setAssigneeSearch(val);
     clearTimeout(searchTimeout.current);
-    if (!val.trim()) { setSearchResults([]); return; }
+    if (!val.trim()) {
+      const suggestions = boardMembers.length > 0 ? boardMembers : workspaceMembers;
+      setSearchResults(suggestions);
+      return;
+    }
     searchTimeout.current = setTimeout(async () => {
       setSearchLoading(true);
       try {
         const res = await authService.searchUsersByName(val);
-        const filtered = (Array.isArray(res) ? res : []).filter((candidate) => (
-          boardMembers.some((member) => String(member.userId) === String(candidate.userId))
-        ));
-        setSearchResults(filtered);
+        setSearchResults(Array.isArray(res) ? res : []);
       } catch { /* silent */ } finally { setSearchLoading(false); }
     }, 350);
+  };
+
+  const handleAssigneeFocus = () => {
+    setShowAssigneeDropdown(true);
+    if (!assigneeSearch.trim()) {
+      const suggestions = boardMembers.length > 0 ? boardMembers : workspaceMembers;
+      setSearchResults(suggestions);
+    }
   };
 
   const handleAssign = async (u) => {
     setAssigneeUser(u);
     setAssigneeSearch(''); setSearchResults([]); setShowAssigneeDropdown(false);
     if (!isNew) {
-      try { await setCardAssignee(card.id, u.userId); } catch { /* silent */ }
+      try { await setCardAssignee(card.id, u); } catch { /* silent */ }
     }
   };
 
@@ -330,7 +371,8 @@ export default function CardModal({ card, onClose, readOnly = false }) {
     if (!newChecklistTitle.trim()) return;
     try {
       const created = await labelService.createChecklist({ cardId: Number(card.id), title: newChecklistTitle.trim() });
-      setChecklists((p) => [...p, { ...created, items: [] }]);
+      const normalizedChecklist = { ...created, checklistId: created.checklistId ?? created.id, items: [] };
+      setChecklists((p) => [...p, normalizedChecklist]);
       setNewChecklistTitle(''); setAddingChecklist(false);
     } catch { /* silent */ }
   };
@@ -346,11 +388,22 @@ export default function CardModal({ card, onClose, readOnly = false }) {
     const title = newItemTexts[checklistId]?.trim();
     if (!title) return;
     try {
-      const raw = await labelService.addChecklistItem(checklistId, { title });
-      const item = normalizeChecklistItem(raw);
-      setChecklists((p) => p.map((cl) => cl.checklistId === checklistId ? { ...cl, items: [...(cl.items || []), item] } : cl));
-      setNewItemTexts((p) => ({ ...p, [checklistId]: '' })); setAddingItemTo(null);
-    } catch { /* silent */ }
+      const raw = await labelService.addChecklistItem(checklistId, { text: title });
+      if (raw && (raw.id || raw.itemId)) {
+        // API returned the created item — update state directly
+        const item = normalizeChecklistItem(raw);
+        setChecklists((p) => p.map((cl) => cl.checklistId === checklistId
+          ? { ...cl, items: [...(cl.items || []), item] }
+          : cl));
+      } else {
+        // API returned null/empty — reload to get the persisted item
+        await loadChecklists();
+      }
+      setNewItemTexts((p) => ({ ...p, [checklistId]: '' }));
+      setAddingItemTo(null);
+    } catch (err) {
+      console.error('[handleAddItem] failed:', err);
+    }
   };
 
   const handleToggleItem = async (checklistId, itemId) => {
@@ -406,6 +459,7 @@ export default function CardModal({ card, onClose, readOnly = false }) {
           status: form.status,
           dueDate: form.dueDate || null,
           startDate: form.startDate || null,
+          assigneeId: assigneeUser?.userId || null,
           coverColor: form.coverColor || null,
         });
       }
@@ -561,11 +615,16 @@ export default function CardModal({ card, onClose, readOnly = false }) {
                 {checklistsLoading && <div className={styles.loadingText}>Loading...</div>}
                 {checklists.map((cl) => {
                   const progress = getChecklistProgress(cl);
+                  const itemsDone = (cl.items || []).filter((i) => i.completed).length;
+                  const itemsTotal = (cl.items || []).length;
                   return (
                     <div key={cl.checklistId} className={styles.checklist}>
                       <div className={styles.checklistHeader}>
                         <span className={styles.checklistTitle}>{cl.title}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span className={`${styles.checklistCountBadge} ${itemsDone === itemsTotal && itemsTotal > 0 ? styles.checklistCountDone : ''}`}>
+                            <CheckSquare size={11} />{itemsDone}/{itemsTotal}
+                          </span>
                           <span className={styles.progressPct}>{progress}%</span>
                           <button className={styles.deleteBtn} onClick={() => handleDeleteChecklist(cl.checklistId)}><Trash2 size={12} /></button>
                         </div>
@@ -744,13 +803,13 @@ export default function CardModal({ card, onClose, readOnly = false }) {
                 <div className={styles.assigneeSearch}>
                   <input className={styles.smallInput} placeholder="Search by name..."
                     value={assigneeSearch} onChange={(e) => handleAssigneeSearch(e.target.value)}
-                    onFocus={() => setShowAssigneeDropdown(true)}
+                    onFocus={handleAssigneeFocus}
                     onBlur={() => setTimeout(() => setShowAssigneeDropdown(false), 200)} disabled={readOnly} />
                   {searchLoading && <div className={styles.loadingText}>Searching...</div>}
                   {showAssigneeDropdown && searchResults.length > 0 && (
                     <div className={styles.searchDropdown}>
                       {searchResults.map((u) => (
-                        <div key={u.userId} className={styles.searchResultItem} onClick={() => !readOnly && handleAssign(u)}>
+                        <div key={u.userId} className={styles.searchResultItem} onMouseDown={(e) => { e.preventDefault(); if (!readOnly) handleAssign(u); }}>
                           <Avatar
                             src={u.avatarUrl}
                             fullName={u.fullName}
@@ -773,15 +832,54 @@ export default function CardModal({ card, onClose, readOnly = false }) {
             {/* Cover color */}
             <div className={styles.sideField}>
               <label className={styles.sideLabel}>Cover Color</label>
-              <div className={styles.coverColors}>
-                <button className={`${styles.coverColorBtn} ${!form.coverColor ? styles.coverSelected : ''}`}
-                  style={{ background: '#f3f4f6', border: '2px solid #d1d5db', color: '#9ca3af' }}
-                  onClick={() => setForm((p) => ({ ...p, coverColor: '' }))} title="No color" disabled={readOnly}>✕</button>
-                {COVER_COLORS.map((c) => (
-                  <button key={c} className={`${styles.coverColorBtn} ${form.coverColor === c ? styles.coverSelected : ''}`}
-                    style={{ background: c }} onClick={() => setForm((p) => ({ ...p, coverColor: c }))} disabled={readOnly} />
-                ))}
+              <div className={styles.coverPickerWrapper}>
+                <button
+                  ref={coverTriggerRef}
+                  type="button"
+                  className={styles.coverPickerTrigger}
+                  style={{ background: form.coverColor || '#f3f4f6' }}
+                  onClick={() => { if (!readOnly) openCoverPicker(); }}
+                  title={form.coverColor ? 'Change cover colour' : 'Choose cover colour'}
+                  disabled={readOnly}
+                >
+                  {!form.coverColor && <Palette size={14} />}
+                </button>
+                {form.coverColor && (
+                  <span className={styles.coverHex}>{form.coverColor}</span>
+                )}
               </div>
+
+              {/* Portal: renders outside overflow:hidden modal */}
+              {showCoverPicker && createPortal(
+                <div
+                  ref={coverPopupRef}
+                  className={styles.coverWheelPortal}
+                  style={{ top: coverPopupPos.top, left: coverPopupPos.left }}
+                >
+                  <p className={styles.coverWheelTitle}>Pick a cover colour</p>
+                  <ColorWheelPicker
+                    value={form.coverColor}
+                    onChange={(hex) => setForm((p) => ({ ...p, coverColor: hex }))}
+                  />
+                  <div className={styles.coverWheelActions}>
+                    <button
+                      type="button"
+                      className={styles.coverClearBtn}
+                      onClick={() => { setForm((p) => ({ ...p, coverColor: '' })); setShowCoverPicker(false); }}
+                    >
+                      Clear
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.coverDoneBtn}
+                      onClick={() => setShowCoverPicker(false)}
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>,
+                document.body,
+              )}
             </div>
           </div>
         </div>

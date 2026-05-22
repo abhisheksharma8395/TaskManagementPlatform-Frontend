@@ -24,6 +24,7 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .logoIcon { font-size: 20px; }
@@ -33,7 +34,7 @@
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #ea580c, #0f766e);
+  background: linear-gradient(135deg, #7c3aed, #0ea5e9);
   color: #fff;
   font-size: 13px;
   font-weight: 800;
@@ -42,7 +43,7 @@
 .logoText {
   font-size: 18px;
   font-weight: 800;
-  background: linear-gradient(135deg, #0f766e, #ea580c);
+  background: linear-gradient(135deg, #7c3aed, #0ea5e9);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -70,10 +71,10 @@
   text-decoration: none;
 }
 
-.navLink:hover { color: #0f766e; background: #ecfeff; }
+.navLink:hover { color: #7c3aed; background: rgba(124,58,237,0.07); }
 
 .active {
-  color: #0f766e;
+  color: #7c3aed;
   font-weight: 700;
 }
 
@@ -84,7 +85,7 @@
   left: 14px;
   right: 14px;
   height: 2px;
-  background: #0f766e;
+  background: #7c3aed;
   border-radius: 2px 2px 0 0;
 }
 
@@ -105,8 +106,8 @@
 }
 
 .searchBox:focus-within {
-  background: #ecfeff;
-  box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.18);
+  background: rgba(124,58,237,0.06);
+  box-shadow: 0 0 0 2px rgba(124,58,237,0.18);
 }
 
 .searchIcon { color: #9ca3af; flex-shrink: 0; }
@@ -140,7 +141,7 @@
   transition: all 0.2s;
 }
 
-.iconBtn:hover, .activeIcon { background: #f3f4f6; color: #0f766e; }
+.iconBtn:hover, .activeIcon { background: rgba(124,58,237,0.08); color: #7c3aed; }
 
 .badge {
   position: absolute;
@@ -189,8 +190,8 @@
 .notifBadge {
   font-size: 11px;
   font-weight: 600;
-  color: #0f766e;
-  background: #ecfeff;
+  color: #7c3aed;
+  background: rgba(124,58,237,0.1);
   padding: 2px 8px;
   border-radius: 20px;
 }
@@ -211,7 +212,7 @@
 
 .notifItem:hover { background: #f9fafb; }
 
-.unread { background: #f0fdfa; }
+.unread { background: rgba(124,58,237,0.04); }
 
 .notifMsg {
   font-size: 13px;
@@ -241,7 +242,7 @@
   overflow: hidden;
 }
 
-.avatarBtn:hover { border-color: #0f766e; }
+.avatarBtn:hover { border-color: #7c3aed; }
 
 .avatarInitials {
   font-size: 12px;

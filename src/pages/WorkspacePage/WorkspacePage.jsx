@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Plus, KanbanSquare, Users, Lock, Globe, X, UserMinus, Edit2, Check } from 'lucide-react';
+import { Plus, KanbanSquare, Users, Lock, Globe, X, UserMinus, Edit2, Check, Palette } from 'lucide-react';
+import ColorWheelPicker from '../../components/ColorWheelPicker/ColorWheelPicker';
 import { useAuth } from '../../context/AuthContext';
 import { useBoard } from '../../context/BoardContext';
 import {
@@ -40,6 +41,16 @@ export default function WorkspacePage() {
   const [error, setError] = useState('');
   const [showMembersPanel, setShowMembersPanel] = useState(false);
   const [membersLoading, setMembersLoading] = useState(false);
+  const [showBgPalette, setShowBgPalette] = useState(false);
+  const bgPickerRef = useRef(null);
+
+  // Close palette when clicking outside
+  useEffect(() => {
+    if (!showBgPalette) return undefined;
+    const handler = (e) => { if (bgPickerRef.current && !bgPickerRef.current.contains(e.target)) setShowBgPalette(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showBgPalette]);
 
   // Edit workspace modal
   const [showEditModal, setShowEditModal] = useState(false);
@@ -253,11 +264,38 @@ export default function WorkspacePage() {
             </label>
             <label>
               Background
-              <input
-                value={form.background}
-                onChange={(event) => setForm((prev) => ({ ...prev, background: event.target.value }))}
-                placeholder="Color or image URL"
-              />
+              <div className={styles.bgPickerWrapper} ref={bgPickerRef}>
+                <button
+                  type="button"
+                  className={styles.bgPickerTrigger}
+                  style={{ background: form.background || '#e5e7eb' }}
+                  onClick={() => setShowBgPalette((v) => !v)}
+                  title={form.background ? 'Change background color' : 'Choose background color'}
+                >
+                  {!form.background && <Palette size={16} />}
+                </button>
+                {form.background && (
+                  <span className={styles.bgPickerLabel}>{form.background}</span>
+                )}
+                {showBgPalette && (
+                  <div className={styles.bgPalette}>
+                    <p className={styles.bgPaletteTitle}>Pick a background colour</p>
+                    <ColorWheelPicker
+                      value={form.background}
+                      onChange={(hex) => {
+                        setForm((prev) => ({ ...prev, background: hex }));
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className={styles.bgConfirmBtn}
+                      onClick={() => setShowBgPalette(false)}
+                    >
+                      Done
+                    </button>
+                  </div>
+                )}
+              </div>
             </label>
           </div>
           {error && <div className={styles.error}>{error}</div>}

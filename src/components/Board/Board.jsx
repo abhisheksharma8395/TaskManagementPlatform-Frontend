@@ -200,7 +200,10 @@ export default function Board() {
   }
 
   return (
-    <div className={styles.boardWrapper}>
+    <div
+      className={styles.boardWrapper}
+      style={{ background: activeBoard?.background || '#f8f9fb' }}
+    >
       <div className={styles.toolbar}>
         <div className={styles.boardInfo}>
           {editingName && canEdit ? (

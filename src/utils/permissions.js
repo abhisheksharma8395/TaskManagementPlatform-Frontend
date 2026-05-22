@@ -144,11 +144,11 @@ export function getRoleLabel(role) {
 
 export function getRoleBadgeColor(role) {
   const colors = {
-    OWNER: { bg: '#fef3c7', color: '#92400e' },
-    ADMIN: { bg: '#ede9fe', color: '#6d28d9' },
-    MEMBER: { bg: '#d1fae5', color: '#065f46' },
+    OWNER:    { bg: '#ede9fe', color: '#6d28d9' },
+    ADMIN:    { bg: '#ddd6fe', color: '#5b21b6' },
+    MEMBER:   { bg: '#e0f2fe', color: '#0369a1' },
     OBSERVER: { bg: '#e5e7eb', color: '#374151' },
-    GUEST: { bg: '#f3f4f6', color: '#6b7280' },
+    GUEST:    { bg: '#f3f4f6', color: '#6b7280' },
   };
   return colors[role?.toUpperCase()] || colors.GUEST;
 }

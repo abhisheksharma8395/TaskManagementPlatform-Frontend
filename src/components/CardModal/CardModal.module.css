@@ -182,9 +182,20 @@
 .checklistTitle { font-size: 13px; font-weight: 600; color: #111827; }
 .progressPct { font-size: 11px; color: #6b7280; }
 
+.checklistCountBadge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 600;
+  padding: 2px 7px; border-radius: 5px;
+  background: #f3f4f6; color: #6b7280;
+  transition: background 0.2s, color 0.2s;
+}
+.checklistCountDone {
+  background: #dcfce7; color: #16a34a;
+}
+
 .progressBar { height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden; }
 .progressFill {
-  height: 100%; background: linear-gradient(90deg, #7c3aed, #10b981);
+  height: 100%; background: linear-gradient(90deg, #7c3aed, #0ea5e9);
   border-radius: 2px; transition: width 0.3s ease;
 }
 
@@ -279,7 +290,7 @@
 
 .reply { display: flex; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f3f4f6; margin-left: 20px; }
 .replyAvatar {
-  width: 28px; height: 28px; border-radius: 50%; background: #10b981;
+  width: 28px; height: 28px; border-radius: 50%; background: #7c3aed;
   color: white; font-size: 11px; font-weight: 700;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   overflow: hidden;
@@ -321,14 +332,112 @@
 .resultName { font-size: 13px; font-weight: 600; color: #111827; }
 .resultEmail { font-size: 11px; color: #9ca3af; }
 
-.coverColors { display: flex; flex-wrap: wrap; gap: 5px; }
-.coverColorBtn {
-  width: 22px; height: 22px; border-radius: 50%;
-  border: 2px solid transparent; cursor: pointer; transition: all 0.15s;
-  font-size: 10px; display: flex; align-items: center; justify-content: center;
+/* ── Cover colour wheel picker ────────────────────────────────────────── */
+.coverPickerWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.coverColorBtn:hover { transform: scale(1.15); }
-.coverSelected { border-color: #1f2937 !important; transform: scale(1.2); }
+
+.coverPickerTrigger {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2.5px solid #d6d3d1;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  flex-shrink: 0;
+  outline: none;
+}
+
+.coverPickerTrigger:hover:not(:disabled) {
+  transform: scale(1.1);
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+.coverPickerTrigger:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.coverHex {
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: #374151;
+  letter-spacing: 0.04em;
+}
+
+.coverWheelPortal {
+  position: fixed;
+  z-index: 9999;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: coverPopIn 0.15s ease;
+  min-width: 260px;
+}
+
+.coverWheelTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0;
+}
+
+.coverWheelActions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.coverClearBtn {
+  flex: 1;
+  padding: 8px 0;
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s;
+}
+
+.coverClearBtn:hover { background: #e5e7eb; }
+
+.coverDoneBtn {
+  flex: 1;
+  padding: 8px 0;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s;
+}
+
+.coverDoneBtn:hover { background: #6d28d9; box-shadow: 0 3px 10px rgba(124, 58, 237, 0.35); }
+
+@keyframes coverPopIn {
+  from { opacity: 0; transform: scale(0.9) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
 
 .smallInput {
   width: 100%; padding: 6px 10px;

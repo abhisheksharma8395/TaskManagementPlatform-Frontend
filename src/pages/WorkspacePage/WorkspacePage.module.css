@@ -84,11 +84,11 @@
 }
 
 .primaryBtn {
-  background: #0f766e;
+  background: #7c3aed;
   color: #fff;
 }
 
-.primaryBtn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3); }
+.primaryBtn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35); }
 .primaryBtn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
 .secondaryBtn {
@@ -197,7 +197,7 @@
   box-sizing: border-box;
 }
 
-.editInput:focus { border-color: #0f766e; box-shadow: 0 0 0 3px rgba(15,118,110,0.1); }
+.editInput:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
 
 .editTextarea {
   width: 100%;
@@ -212,7 +212,7 @@
   box-sizing: border-box;
 }
 
-.editTextarea:focus { border-color: #0f766e; box-shadow: 0 0 0 3px rgba(15,118,110,0.1); }
+.editTextarea:focus { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
 
 .editError {
   font-size: 13px;
@@ -271,6 +271,92 @@
 .error {
   color: #b91c1c;
   font-size: 14px;
+}
+
+/* ── Background colour picker ─────────────────────────────────────────── */
+.bgPickerWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bgPickerTrigger {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2.5px solid #d6d3d1;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  flex-shrink: 0;
+  outline: none;
+}
+
+.bgPickerTrigger:hover {
+  transform: scale(1.1);
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+}
+
+.bgPickerLabel {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.bgPalette {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 200;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: paletteIn 0.15s ease;
+  min-width: 260px;
+}
+
+.bgPaletteTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.bgConfirmBtn {
+  width: 100%;
+  padding: 9px 0;
+  background: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.bgConfirmBtn:hover {
+  background: #6d28d9;
+  box-shadow: 0 3px 10px rgba(124,58,237,0.35);
+}
+
+@keyframes paletteIn {
+  from { opacity: 0; transform: scale(0.9) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 /* ── Members Panel (slide-in drawer) ──────────────────────────────────── */

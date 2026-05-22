@@ -1,25 +1,3 @@
-/**
- * labelService.js  (NEW FILE)
- * Maps to label-service endpoints (routed via API Gateway).
- *
- * Backend routes:
- *   POST   /labels                              → create label { boardId, name, color }
- *   GET    /labels/board/{boardId}              → get labels for board
- *   GET    /labels/{labelId}                    → get label by id
- *   PUT    /labels/{labelId}                    → update label { name?, color? }
- *   DELETE /labels/{labelId}                    → delete label
- *   POST   /labels/card                         → attach label to card { cardId, labelId }
- *   DELETE /labels/card/{cardId}/label/{labelId} → remove label from card
- *   GET    /labels/card/{cardId}                → get labels on card
- *   POST   /checklists                          → create checklist { cardId, title }
- *   GET    /checklists/{checklistId}            → get checklist
- *   GET    /checklists/card/{cardId}            → get checklists for card
- *   DELETE /checklists/{checklistId}            → delete checklist
- *   GET    /checklists/{checklistId}/progress   → get progress (0-100)
- *   POST   /checklists/{checklistId}/items      → add item { title }
- *   PUT    /checklists/items/{itemId}/toggle    → toggle item complete
- *   DELETE /checklists/items/{itemId}           → delete item
- */
 import api from './axiosInstance';
 
 // ─── Labels ──────────────────────────────────────────────────────────────────

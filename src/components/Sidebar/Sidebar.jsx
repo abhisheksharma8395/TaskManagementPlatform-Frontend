@@ -6,8 +6,6 @@ import {
   ChevronDown,
   ChevronRight,
   Globe,
-  HelpCircle,
-  KanbanSquare,
   LayoutDashboard,
   Plus,
   Settings,
@@ -249,11 +247,6 @@ export default function Sidebar() {
           <span>Public Dashboard</span>
         </Link>
 
-        <Link to="/tasks" className={`${styles.navItem} ${location.pathname === '/tasks' ? styles.active : ''}`}>
-          <KanbanSquare size={16} />
-          <span>My Tasks</span>
-        </Link>
-
         {/* ── Boards section ──────────────────────────────────────────────── */}
         <div className={styles.sectionHeader}>
           <button className={styles.sectionToggle} onClick={() => setBoardsExpanded((value) => !value)}>
@@ -391,10 +384,6 @@ export default function Sidebar() {
             <span>Admin</span>
           </Link>
         )}
-        <button className={styles.navItem}>
-          <HelpCircle size={16} />
-          <span>Help</span>
-        </button>
         <Link to="/settings" className={`${styles.navItem} ${location.pathname === '/settings' ? styles.active : ''}`}>
           <Settings size={16} />
           <span>Settings</span>
