@@ -5,27 +5,11 @@
  */
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Settings2, Eye } from 'lucide-react';
+import { X, Settings2 } from 'lucide-react';
+import ColorWheelPicker from '../ColorWheelPicker/ColorWheelPicker';
 import styles from './BoardSettingsModal.module.css';
 
-const PRESET_BACKGROUNDS = [
-  'linear-gradient(135deg, #667eea, #764ba2)',
-  'linear-gradient(135deg, #f97316, #fb7185)',
-  'linear-gradient(135deg, #0f766e, #0ea5e9)',
-  'linear-gradient(135deg, #7c3aed, #ec4899)',
-  'linear-gradient(135deg, #10b981, #06b6d4)',
-  'linear-gradient(135deg, #f59e0b, #ef4444)',
-  'linear-gradient(135deg, #1e3a5f, #0f766e)',
-  'linear-gradient(135deg, #6d28d9, #3b82f6)',
-  '#1f2937',
-  '#374151',
-  '#7c3aed',
-  '#0f766e',
-  '#ea580c',
-  '#dc2626',
-  '#2563eb',
-  '#ec4899',
-];
+
 
 export default function BoardSettingsModal({ board, onClose, onSave, canEdit = false }) {
   const [form, setForm] = useState({
@@ -35,7 +19,6 @@ export default function BoardSettingsModal({ board, onClose, onSave, canEdit = f
     visibility: board?.visibility || 'PRIVATE',
   });
   const [saving, setSaving] = useState(false);
-  const [customBg, setCustomBg] = useState('');
 
   const handleSave = async () => {
     if (!form.name.trim() || !canEdit) return;
@@ -53,20 +36,6 @@ export default function BoardSettingsModal({ board, onClose, onSave, canEdit = f
     }
   };
 
-  const handleSetCustomBg = () => {
-    if (customBg.trim()) {
-      setForm((p) => ({ ...p, background: customBg.trim() }));
-      setCustomBg('');
-    }
-  };
-
-  const getPreviewStyle = () => {
-    const bg = form.background;
-    if (!bg) return { background: 'linear-gradient(135deg, #f97316, #fb7185)' };
-    if (bg.startsWith('linear-gradient') || bg.startsWith('#')) return { background: bg };
-    return { background: `url(${bg}) center/cover no-repeat` };
-  };
-
   return createPortal(
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -78,16 +47,6 @@ export default function BoardSettingsModal({ board, onClose, onSave, canEdit = f
           <button className={styles.closeBtn} onClick={onClose}>
             <X size={18} />
           </button>
-        </div>
-
-        {/* Live Preview */}
-        <div className={styles.preview} style={getPreviewStyle()}>
-          <div className={styles.previewOverlay}>
-            <Eye size={16} />
-            <span>Live Preview</span>
-          </div>
-          <h3 className={styles.previewTitle}>{form.name || 'Board Name'}</h3>
-          <p className={styles.previewDesc}>{form.description || 'Board description'}</p>
         </div>
 
         <div className={styles.body}>
@@ -131,30 +90,11 @@ export default function BoardSettingsModal({ board, onClose, onSave, canEdit = f
           {canEdit && (
             <div className={styles.field}>
               <label className={styles.label}>Background</label>
-              <div className={styles.bgGrid}>
-                <button
-                  className={`${styles.bgOption} ${!form.background ? styles.bgSelected : ''}`}
-                  style={{ background: 'linear-gradient(135deg, #f97316, #fb7185)' }}
-                  onClick={() => setForm((p) => ({ ...p, background: '' }))}
-                  title="Default"
+              <div className={styles.colorWheelSection}>
+                <ColorWheelPicker
+                  value={form.background}
+                  onChange={(hex) => setForm((prev) => ({ ...prev, background: hex }))}
                 />
-                {PRESET_BACKGROUNDS.map((bg) => (
-                  <button
-                    key={bg}
-                    className={`${styles.bgOption} ${form.background === bg ? styles.bgSelected : ''}`}
-                    style={{ background: bg }}
-                    onClick={() => setForm((p) => ({ ...p, background: bg }))}
-                  />
-                ))}
-              </div>
-              <div className={styles.customBgRow}>
-                <input
-                  className={styles.input}
-                  value={customBg}
-                  onChange={(e) => setCustomBg(e.target.value)}
-                  placeholder="Custom color or image URL..."
-                />
-                <button className={styles.applyBtn} onClick={handleSetCustomBg}>Apply</button>
               </div>
             </div>
           )}

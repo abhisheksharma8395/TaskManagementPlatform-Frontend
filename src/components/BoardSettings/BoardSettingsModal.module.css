@@ -54,49 +54,6 @@
 
 .closeBtn:hover { background: #f3f4f6; color: #374151; }
 
-/* Live Preview */
-.preview {
-  margin: 16px 24px;
-  border-radius: 14px;
-  padding: 28px 24px;
-  position: relative;
-  overflow: hidden;
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-
-.previewOverlay {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.4);
-  color: white;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-  backdrop-filter: blur(4px);
-}
-
-.previewTitle {
-  color: white;
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-}
-
-.previewDesc {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 13px;
-  margin: 4px 0 0;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
 
 .body {
   padding: 0 24px 8px;
@@ -177,6 +134,12 @@
 .customBgRow {
   display: flex;
   gap: 8px;
+}
+
+.colorWheelSection {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 4px;
 }
 
 .applyBtn {

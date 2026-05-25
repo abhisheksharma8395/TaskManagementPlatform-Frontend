@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Plus, KanbanSquare, Users, Lock, Globe, X, UserMinus, Edit2, Check, Palette } from 'lucide-react';
+import { Plus, KanbanSquare, Users, Lock, Globe, X, UserMinus, Edit2, Check, Palette, MoreHorizontal, Trash2 } from 'lucide-react';
 import ColorWheelPicker from '../../components/ColorWheelPicker/ColorWheelPicker';
+import BoardSettingsModal from '../../components/BoardSettings/BoardSettingsModal';
 import { useAuth } from '../../context/AuthContext';
 import { useBoard } from '../../context/BoardContext';
 import {
@@ -11,6 +12,8 @@ import {
   getWorkspaceRole,
   getRoleLabel,
   getRoleBadgeColor,
+  canEditBoard,
+  canDeleteBoard,
 } from '../../utils/permissions';
 import Avatar, { AvatarStack } from '../../components/Avatar/Avatar';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
@@ -32,7 +35,10 @@ export default function WorkspacePage() {
     removeWorkspaceMember,
     updateWorkspaceMemberRole,
     getCachedWorkspaceMembers,
+    getCachedBoardMembers,
     loadingBoards,
+    updateBoard,
+    deleteBoard,
   } = useBoard();
 
   const [showForm, setShowForm] = useState(false);
@@ -62,6 +68,40 @@ export default function WorkspacePage() {
   // Confirm modal for removing a member
   const [confirmRemoveMember, setConfirmRemoveMember] = useState(null);
   const [removingMember, setRemovingMember] = useState(false);
+
+  // Edit/delete board states
+  const [editingBoardSettings, setEditingBoardSettings] = useState(null);
+  const [deleteBoardTarget, setDeleteBoardTarget] = useState(null);
+  const [deletingBoard, setDeletingBoard] = useState(false);
+  const [openBoardDropdownId, setOpenBoardDropdownId] = useState(null);
+
+  // Close board dropdown when clicking outside
+  useEffect(() => {
+    if (!openBoardDropdownId) return undefined;
+    const handler = (e) => {
+      if (!e.target.closest(`.${styles.cardActionsWrap}`)) {
+        setOpenBoardDropdownId(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [openBoardDropdownId]);
+
+  const handleBoardSettingsSave = async (boardId, data) => {
+    await updateBoard(boardId, data);
+    setEditingBoardSettings(null);
+  };
+
+  const handleDeleteBoard = async () => {
+    if (!deleteBoardTarget) return;
+    setDeletingBoard(true);
+    try {
+      await deleteBoard(deleteBoardTarget.id);
+    } finally {
+      setDeletingBoard(false);
+      setDeleteBoardTarget(null);
+    }
+  };
 
   const workspace = useMemo(
     () => workspaces.find((item) => item.id === String(workspaceId))
@@ -98,6 +138,7 @@ export default function WorkspacePage() {
   const canManageMembersRole = canManageMembers(user, workspace, workspaceMembers);
   const currentUserRole = getWorkspaceRole(workspace, workspaceMembers, user?.userId);
   const isGuest = currentUserRole === 'GUEST';
+  const isWorkspaceOwner = workspace && String(workspace.ownerId) === String(user?.userId);
 
   const handleCreateBoard = async (event) => {
     event.preventDefault();
@@ -328,8 +369,57 @@ export default function WorkspacePage() {
                       ? board.background
                       : `url(${board.background}) center/cover`
                     : 'linear-gradient(135deg, #f97316, #fb7185)',
+                  position: 'relative',
                 }}
-              />
+              >
+                {/* Board Actions Dropdown */}
+                {(() => {
+                  const canEditB = canEditBoard(user, board, getCachedBoardMembers(board.id)) || isWorkspaceOwner;
+                  const canDeleteB = canDeleteBoard(user, board, getCachedBoardMembers(board.id)) || isWorkspaceOwner;
+                  if (!canEditB && !canDeleteB) return null;
+                  return (
+                    <div className={styles.cardActionsWrap} onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+                      <button
+                        className={styles.cardActionsBtn}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setOpenBoardDropdownId(openBoardDropdownId === board.id ? null : board.id);
+                        }}
+                        title="Board actions"
+                      >
+                        <MoreHorizontal size={16} />
+                      </button>
+                      {openBoardDropdownId === board.id && (
+                        <div className={styles.actionsDropdown}>
+                          {canEditB && (
+                            <button
+                              className={styles.actionItem}
+                              onClick={() => {
+                                setOpenBoardDropdownId(null);
+                                setEditingBoardSettings(board);
+                              }}
+                            >
+                              <Edit2 size={13} /> Edit Board
+                            </button>
+                          )}
+                          {canDeleteB && (
+                            <button
+                              className={`${styles.actionItem} ${styles.actionDanger}`}
+                              onClick={() => {
+                                setOpenBoardDropdownId(null);
+                                setDeleteBoardTarget(board);
+                              }}
+                            >
+                              <Trash2 size={13} /> Delete Board
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
               <div className={styles.boardBody}>
                 <div className={styles.boardTop}>
                   <h3>{board.name}</h3>
@@ -498,6 +588,28 @@ export default function WorkspacePage() {
         loading={removingMember}
         onConfirm={handleRemoveMember}
         onCancel={() => setConfirmRemoveMember(null)}
+      />
+
+      {/* Board Settings Modal */}
+      {editingBoardSettings && (
+        <BoardSettingsModal
+          board={editingBoardSettings}
+          canEdit={canEditBoard(user, editingBoardSettings, getCachedBoardMembers(editingBoardSettings.id)) || isWorkspaceOwner}
+          onClose={() => setEditingBoardSettings(null)}
+          onSave={handleBoardSettingsSave}
+        />
+      )}
+
+      {/* Delete Board Confirmation */}
+      <ConfirmModal
+        open={!!deleteBoardTarget}
+        title="Delete Board"
+        message={`Are you sure you want to permanently delete "${deleteBoardTarget?.name}"? All lists and cards inside will be removed. This cannot be undone.`}
+        confirmLabel="Delete Board"
+        variant="danger"
+        loading={deletingBoard}
+        onConfirm={handleDeleteBoard}
+        onCancel={() => setDeleteBoardTarget(null)}
       />
     </section>
   );

@@ -632,7 +632,9 @@ export function BoardProvider({ children }) {
     const card = cards.find((item) => item.id === String(cardId));
     await ensureBoardAccess(card?.boardId, { collaborate: true });
     const updated = normalizeCard(await cardService.updateCard(cardId, updates), card?.listId);
-    setCards((prev) => prev.map((item) => (item.id === String(cardId) ? { ...item, ...updated } : item)));
+    // Merge `updates` last so explicitly-cleared fields (e.g. startDate: null, dueDate: null)
+    // always override whatever the backend returns in its response.
+    setCards((prev) => prev.map((item) => (item.id === String(cardId) ? { ...item, ...updated, ...updates } : item)));
     return updated;
   }, [cards, ensureBoardAccess]);
 

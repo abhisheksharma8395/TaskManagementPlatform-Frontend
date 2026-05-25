@@ -67,6 +67,21 @@ export default function CardModal({ card, onClose, readOnly = false }) {
   });
   const [saving, setSaving] = useState(false);
 
+  // Sync form when the live card from context changes (e.g. after saving cleared dates)
+  useEffect(() => {
+    setForm({
+      title: card.title || '',
+      description: card.description || '',
+      priority: card.priority || 'MEDIUM',
+      status: card.status || 'TO_DO',
+      dueDate: card.dueDate ? String(card.dueDate).slice(0, 10) : '',
+      startDate: card.startDate ? String(card.startDate).slice(0, 10) : '',
+      listId: card.listId || '',
+      coverColor: card.coverColor || '',
+    });
+  }, [card.id, card.title, card.description, card.priority, card.status,
+      card.dueDate, card.startDate, card.coverColor]); // eslint-disable-line
+
   // Assignee
   const [assigneeSearch, setAssigneeSearch] = useState('');
   const [searchResults, setSearchResults] = useState([]);

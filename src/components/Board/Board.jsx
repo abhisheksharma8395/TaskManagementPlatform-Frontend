@@ -25,6 +25,7 @@ export default function Board() {
   const {
     activeBoardId,
     boards,
+    cards,
     getBoardLists,
     addList,
     moveCard,
@@ -40,16 +41,21 @@ export default function Board() {
     removeBoardMember,
     updateBoardMemberRole,
     getCachedBoardMembers,
+    workspaces,
   } = useBoard();
 
   const lists = getBoardLists(activeBoardId);
   const activeBoard = boards.find((board) => board.id === activeBoardId) || null;
   const boardMembers = getCachedBoardMembers(activeBoardId);
   const boardRole = getBoardRole(activeBoard, boardMembers, user?.userId);
-  const isGuest = isGuestOnBoard(user, activeBoard, boardMembers);
-  const canCollaborate = canCollaborateOnBoard(user, activeBoard, boardMembers) && !activeBoard?.isClosed;
-  const canManage = canManageBoard(user, activeBoard, boardMembers);
-  const canEdit = canEditBoard(user, activeBoard, boardMembers);
+  
+  const workspace = activeBoard ? workspaces.find((w) => String(w.id) === String(activeBoard.workspaceId)) : null;
+  const isWorkspaceOwner = workspace && String(workspace.ownerId) === String(user?.userId);
+  
+  const isGuest = isGuestOnBoard(user, activeBoard, boardMembers) && !isWorkspaceOwner;
+  const canCollaborate = (canCollaborateOnBoard(user, activeBoard, boardMembers) || isWorkspaceOwner) && !activeBoard?.isClosed;
+  const canManage = canManageBoard(user, activeBoard, boardMembers) || isWorkspaceOwner;
+  const canEdit = canEditBoard(user, activeBoard, boardMembers) || isWorkspaceOwner;
 
   const [editingCard, setEditingCard] = useState(null);
   const [addingList, setAddingList] = useState(false);
@@ -248,6 +254,13 @@ export default function Board() {
             Members
           </button>
 
+          {canEdit && (
+            <button className={styles.filterBtn} onClick={() => setShowSettings(true)}>
+              <Settings2 size={14} />
+              Board Settings
+            </button>
+          )}
+
           {/* Only show New Task button for collaborators, NOT guests */}
           {canCollaborate && (
             <button
@@ -350,7 +363,7 @@ export default function Board() {
 
       {editingCard && (
         <CardModal
-          card={editingCard}
+          card={editingCard.id ? (cards.find((c) => c.id === String(editingCard.id)) || editingCard) : editingCard}
           readOnly={isGuest || !canCollaborate}
           onClose={() => setEditingCard(null)}
         />

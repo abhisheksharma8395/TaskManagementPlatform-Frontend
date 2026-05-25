@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, LogOut, Search, Settings, Shield, User } from 'lucide-react';
+import { Bell, LogOut, Settings, Shield, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import * as notificationService from '../../api/notificationService';
 import Avatar from '../Avatar/Avatar';
@@ -10,7 +10,6 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout, isPlatformAdmin } = useAuth();
-  const [search, setSearch] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
@@ -93,17 +92,6 @@ export default function Navbar() {
       </div>
 
       <div className={styles.right}>
-        <div className={styles.searchBox}>
-          <Search size={15} className={styles.searchIcon} />
-          <input
-            type="text"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            className={styles.searchInput}
-            placeholder="Search cards, labels, assignees..."
-          />
-        </div>
-
         <div className={styles.relativeWrap} ref={notifRef}>
           <button className={styles.iconBtn} onClick={toggleNotifications}>
             <Bell size={18} />
