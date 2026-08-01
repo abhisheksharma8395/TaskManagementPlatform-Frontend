@@ -1,0 +1,177 @@
+export const initialBoards = [
+  { id: 'board-1', name: 'Product Roadmap 2024', icon: '🗂️', updatedAt: '2 hours ago' },
+  { id: 'board-2', name: 'Project Alpha Q3', icon: '🚀', updatedAt: 'yesterday' },
+  { id: 'board-3', name: 'Design System', icon: '🎨', updatedAt: '3 days ago' },
+];
+
+export const initialLists = [
+  { id: 'list-1', boardId: 'board-1', title: 'TO DO', order: 0 },
+  { id: 'list-2', boardId: 'board-1', title: 'IN PROGRESS', order: 1 },
+  { id: 'list-3', boardId: 'board-1', title: 'DONE', order: 2 },
+];
+
+export const initialCards = [
+  {
+    id: 'card-1',
+    listId: 'list-1',
+    title: 'Update Brand Guidelines',
+    description: 'Revise the color palette and logo usage across all digital platforms fo...',
+    label: 'Design',
+    labelColor: '#00C9A7',
+    dueDate: 'Oct 24',
+    assignees: ['A', 'B'],
+    order: 0,
+    completed: false,
+  },
+  {
+    id: 'card-2',
+    listId: 'list-1',
+    title: 'Q4 Product Roadmap',
+    description: 'Finalize the feature list and timeline for the upcoming quarterly release.',
+    label: 'Planning',
+    labelColor: '#6C63FF',
+    dueDate: 'Oct 28',
+    assignees: ['C'],
+    order: 1,
+    completed: false,
+  },
+  {
+    id: 'card-3',
+    listId: 'list-1',
+    title: 'User Interview Guide',
+    description: 'Prepare the discussion guide for the upcoming user research sessions.',
+    label: 'Research',
+    labelColor: '#FF6584',
+    dueDate: 'Nov 2',
+    assignees: ['A'],
+    order: 2,
+    completed: false,
+  },
+  {
+    id: 'card-4',
+    listId: 'list-2',
+    title: 'Mobile App Prototyping',
+    description: 'Create high-fidelity wireframes for the mobile checkout flow.',
+    label: 'Design',
+    labelColor: '#00C9A7',
+    dueDate: 'Oct 30',
+    assignees: ['B', 'D', 'E'],
+    progress: 65,
+    comments: 12,
+    order: 0,
+    completed: false,
+  },
+  {
+    id: 'card-5',
+    listId: 'list-2',
+    title: 'Fix API Latency Issues',
+    description: 'Investigate server response times for the analytics dashboard endpoints.',
+    label: 'High Priority',
+    labelColor: '#FF4444',
+    dueDate: null,
+    assignees: ['F'],
+    isOverdue: true,
+    order: 1,
+    completed: false,
+  },
+  {
+    id: 'card-6',
+    listId: 'list-2',
+    title: 'Dashboard API Integration',
+    description: 'Connecting the front-end widgets to the live data stream from the cloud services.',
+    label: 'Development',
+    labelColor: '#7C3AED',
+    dueDate: '25-10-2023',
+    assignees: ['A'],
+    order: 2,
+    completed: false,
+  },
+  {
+    id: 'card-7',
+    listId: 'list-3',
+    title: 'Onboarding Flow Documentation',
+    description: 'Export all diagrams for the develop...',
+    label: 'Documentation',
+    labelColor: '#9CA3AF',
+    dueDate: null,
+    assignees: [],
+    order: 0,
+    completed: true,
+  },
+];
+
+export const sidebarNavItems = [
+  { id: 'my-tasks', label: 'My Tasks', icon: 'CheckSquare', path: '/tasks' },
+  { id: 'project-alpha', label: 'Project Alpha', icon: 'Rocket', path: '/boards/board-2' },
+  { id: 'design-system', label: 'Design System', icon: 'Layers', path: '/boards/board-3' },
+  { id: 'marketing', label: 'Marketing', icon: 'Megaphone', path: '/boards/board-1' },
+  { id: 'archive', label: 'Archive', icon: 'Archive', path: '/archive' },
+];
+
+export const timelineData = [
+  {
+    id: 'tl-1',
+    name: 'Design System Update',
+    team: 'UI/UX TEAM',
+    avatar: null,
+    avatarText: 'DS',
+    avatarBg: '#7C3AED',
+    tasks: [
+      { id: 'task-1', name: 'Component Library Audit', startDay: 1, span: 4, color: '#7C3AED', icon: '🔄' },
+    ],
+  },
+  {
+    id: 'tl-2',
+    name: 'Q3 Brand Launch',
+    team: 'MARKETING',
+    avatar: null,
+    avatarText: 'MC',
+    avatarBg: '#F59E0B',
+    tasks: [
+      { id: 'task-2', name: 'Social Media Assets Prep', startDay: 3, span: 3, color: '#10B981', outlined: true },
+    ],
+  },
+  {
+    id: 'tl-3',
+    name: 'Auth API Overhaul',
+    team: 'ENGINEERING',
+    avatar: 'https://i.pravatar.cc/32?img=3',
+    avatarText: 'AA',
+    avatarBg: '#EF4444',
+    tasks: [
+      { id: 'task-3', name: 'Refactor JWT Middleware', startDay: 2, span: 5, color: '#7C3AED', locked: true },
+    ],
+  },
+  {
+    id: 'tl-4',
+    name: 'User Research',
+    team: 'PRODUCT',
+    avatar: null,
+    avatarText: 'UR',
+    avatarBg: '#6B7280',
+    tasks: [
+      { id: 'task-4', name: 'Persona Interviews', startDay: 5, span: 3, color: '#F59E0B', outlined: true },
+    ],
+  },
+  {
+    id: 'tl-5',
+    name: 'Bug Bash Round 1',
+    team: 'ENGINEERING',
+    avatar: null,
+    avatarText: 'QA',
+    avatarBg: '#F59E0B',
+    tasks: [
+      { id: 'task-5', name: 'Critical Fixes', startDay: 3, span: 2, color: '#EF4444' },
+    ],
+  },
+];
+
+export const LABEL_OPTIONS = [
+  { value: 'Design', label: 'Design', color: '#00C9A7' },
+  { value: 'Development', label: 'Development', color: '#7C3AED' },
+  { value: 'Planning', label: 'Planning', color: '#6C63FF' },
+  { value: 'Research', label: 'Research', color: '#FF6584' },
+  { value: 'High Priority', label: 'High Priority', color: '#FF4444' },
+  { value: 'Documentation', label: 'Documentation', color: '#9CA3AF' },
+  { value: 'Marketing', label: 'Marketing', color: '#F59E0B' },
+];
